@@ -49,7 +49,7 @@ class EmailLoginApp(QWidget):
 
     # 基本布局
     def init_ui(self):
-        self.setWindowTitle("～～威胁情报攻击源拉取、汇总～～")
+        self.setWindowTitle("～～xxxxxxxxxxxx拉取、汇总～～")
         self.setGeometry(100, 100, 600, 500)
         # 定义一堆组建
         self.email_label = QLabel("邮箱地址:")
@@ -325,7 +325,7 @@ class EmailLoginApp(QWidget):
         os.makedirs(os.path.join(self.now_path,folder_name), exist_ok=True)
         # 获取当前目录下的所有文件
         files = [file for file in os.listdir(self.now_path) if "附件中需要的存在字段： xxxxxxxxxxxxx" in file]
-        # 移动所有包含“威胁情报攻击源”的文件到新创建的文件夹
+        # 移动所有包含“xxxxxxxxx”的文件到新创建的文件夹
         for file in files:
             source_path = os.path.join(self.now_path, file)
             destination_path = os.path.join(self.now_path, folder_name, file)
