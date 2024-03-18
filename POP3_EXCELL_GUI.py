@@ -31,6 +31,7 @@ class EmailLoginApp(QWidget):
         self.email_address = None
         self.mail = None
         self.email_count = int(1)
+        self.filename = "file_name" 
         # Unix LIke SYS 打包获取路径  os.getcwd()失效
         # if getattr(sys, 'frozen', False):
         #     self.now_path = os.path.dirname(sys.executable)
@@ -38,7 +39,9 @@ class EmailLoginApp(QWidget):
         #     self.now_path = os.path.dirname(__file__)
         
         # 固定路径
-        self.now_path="????待定！！！！！！！！！！！！！！"
+        #self.now_path="????待定！！！！！！！！！！！！！！"
+        #测试完全可用的方式：nuitka3打包后也能获取正确的二进制文件所在路径
+        self.now_path=os.path.join(os.path.dirname(sys.argv[0]))
 
         # windows和unix类直接运行python文件时可用
         # self.now_path = os.getcwd()
@@ -49,20 +52,20 @@ class EmailLoginApp(QWidget):
 
     # 基本布局
     def init_ui(self):
-        self.setWindowTitle("～～xxxxxxxxxxxx附件拉取、汇总～～")
+        self.setWindowTitle("～～"+self.filename+"附件拉取、汇总～～，当前路径："+self.now_path)
         self.setGeometry(100, 100, 600, 500)
         # 定义一堆组建
         self.email_label = QLabel("邮箱地址:")
         self.email_input = QLineEdit()
-        self.email_input.setText("xxxxxxxxxxxxxxx")
+        self.email_input.setText("email addr")
         self.password_label = QLabel("密码:")
         self.password_input = QLineEdit()
-        #self.password_input.setPlaceholderText("  密码不可见o.O ")
+        self.password_input.setPlaceholderText("  密码不可见o.O ")
         self.password_input.setText("xxxxxxxxxxxxxxxxxxxx")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.server_label = QLabel("邮件服务器地址:")
         self.server_input = QLineEdit()
-        self.server_input.setText("xxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.server_input.setText("email server")
         self.login_button = QPushButton("登录")
         self.login_button.clicked.connect(self.login_to_email)
         # 全局输出框
@@ -76,7 +79,7 @@ class EmailLoginApp(QWidget):
         self.process_button = QPushButton("获取邮件：一次获取完成后再执行其他任务 防止多线程拉邮件被服务器封ip")
         self.process_button.clicked.connect(self.process_emails_threaded)
         # 添加一个按钮来打开self.now_path文件夹
-        self.open_folder_button = QPushButton("打开文件夹")
+        self.open_folder_button = QPushButton("打开当前工工作文件夹")
         self.open_folder_button.clicked.connect(self.open_folder)
 
         # 添加布局
@@ -250,7 +253,7 @@ class EmailLoginApp(QWidget):
                             except Exception as e:
                                 pass
                             #文件名判断
-                            if  "附件中需要的存在字段： xxxxxxxxxxxxx" in filename:
+                            if  self.filename in filename:
                                 # 使用信号向主线程发送消息
                                 self.update_output_text_signal.emit(f"拉取："+filename+"   "+date_str)
                                 filename = os.path.join(self.now_path, filename)
@@ -266,7 +269,7 @@ class EmailLoginApp(QWidget):
 
         #///////////////////////////////////////////////////汇总数据///////////////////////////////////////////////
         # 获取当前目录下的所有Excel文件
-        excel_files = [file for file in os.listdir(self.now_path) if file.endswith('.xlsx') and "附件中需要的存在字段： xxxxxxxxxxxxx" in file]
+        excel_files = [file for file in os.listdir(self.now_path) if file.endswith('.xlsx') and self.filename in file]
         # 创建一个空的DataFrame来存储数据
         all_data = pd.DataFrame()
         # 存储文件名称
@@ -275,7 +278,7 @@ class EmailLoginApp(QWidget):
         for file in excel_files:
             # 备注文件名获取
             parts = file.split('-')
-            data_sources_name = parts[1]+"_"+parts[2][:-5]+"_XWSOC"
+            data_sources_name = parts[1]+"_"+parts[2][:-5]+"_备注名"
 
             df = pd.read_excel(os.path.join(self.now_path, file), header=0)  # 忽略每列的标题
             first_column = df.iloc[:, 0]
@@ -324,8 +327,8 @@ class EmailLoginApp(QWidget):
             folder_name = days_ago2.strftime('%Y.%m.%d')+" -- "+ days_ago1.strftime('%Y.%m.%d')
         os.makedirs(os.path.join(self.now_path,folder_name), exist_ok=True)
         # 获取当前目录下的所有文件
-        files = [file for file in os.listdir(self.now_path) if "附件中需要的存在字段： xxxxxxxxxxxxx" in file]
-        # 移动所有包含“x x x x x x x x x x x”的文件到新创建的文件夹
+        files = [file for file in os.listdir(self.now_path) if self.filename in file]
+        # 移动所有包含filename的文件到新创建的文件夹
         for file in files:
             source_path = os.path.join(self.now_path, file)
             destination_path = os.path.join(self.now_path, folder_name, file)
